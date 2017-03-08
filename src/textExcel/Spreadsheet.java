@@ -20,6 +20,7 @@ public class Spreadsheet implements Grid {
             return cell.fullCellText();
         // Assignment
         } else if (command.contains("=")) {
+            // Seperate the cell and the contents
             String[] setCommand = command.split(" = ", 2);
             this.set(setCommand);
             return this.getGridText();
@@ -46,13 +47,9 @@ public class Spreadsheet implements Grid {
         // TextCell
         if (value.contains("\"")) {
             // Substring extracts the String's text
-            this.set(loc, value.substring(1, value.length() - 1));
+            String contents = value.substring(1, value.length() - 1);
+            this.spreadsheet[loc.getRow()][loc.getCol()] = new TextCell(contents);
         }
-    }
-
-    // Sets a cell to a TextCell
-    private void set(Location loc, String value) {
-        this.spreadsheet[loc.getRow()][loc.getCol()] = new TextCell(value);
     }
 
     // Sets every cell in the spreadsheet to an EmptyCell
@@ -70,28 +67,29 @@ public class Spreadsheet implements Grid {
     }
 
     @Override
+    // Using a StringBuilder here saves memory
     public String getGridText() {
-        String grid = new String();
+        StringBuilder grid = new StringBuilder();
 
         // Header
-        grid += "   ";
+        grid.append("   ");
         for (int i = 0; i < this.cols; i++) {
             String colLetter = Character.toString((char) ('A' + i));
-            grid += pad(colLetter, 10) + "|";
+            grid.append(pad(colLetter, 10) + "|");
         }
 
         // Print the rows
         for (int rows = 0; rows < this.rows; rows++) {
             // Get the row number properly spaced
-            grid += "\n" + pad(Integer.toString(rows + 1), 2) + "|";
+            grid.append("\n" + pad(Integer.toString(rows + 1), 2) + "|");
             // Append the row content
             for (int cols = 0; cols < this.cols; cols++) {
                 Cell curCell = this.getCell(new SpreadsheetLocation(rows, cols));
-                grid += pad(curCell.abbreviatedCellText(), 10) + "|";
+                grid.append(pad(curCell.abbreviatedCellText(), 10) + "|");
             }
         }
 
-        return grid;
+        return grid.toString();
     }
 
     // Adds spaces to the end of a string, so that the string has length chars

@@ -39,6 +39,7 @@ public class Spreadsheet implements Grid {
     }
 
     // Sets the value of a cell
+    // Also creates a new cell object of the correct type
     // command[0] = location
     // command[1] = value
     private void set(String[] command) {
@@ -72,7 +73,7 @@ public class Spreadsheet implements Grid {
         StringBuilder grid = new StringBuilder();
 
         // Header
-        grid.append("   ");
+        grid.append("   |");
         for (int i = 0; i < this.cols; i++) {
             String colLetter = Character.toString((char) ('A' + i));
             grid.append(pad(colLetter, 10) + "|");
@@ -81,13 +82,14 @@ public class Spreadsheet implements Grid {
         // Print the rows
         for (int rows = 0; rows < this.rows; rows++) {
             // Get the row number properly spaced
-            grid.append("\n" + pad(Integer.toString(rows + 1), 2) + "|");
+            grid.append("\n" + pad(Integer.toString(rows + 1), 3) + "|");
             // Append the row content
             for (int cols = 0; cols < this.cols; cols++) {
                 Cell curCell = this.getCell(new SpreadsheetLocation(rows, cols));
-                grid.append(pad(curCell.abbreviatedCellText(), 10) + "|");
+                grid.append(curCell.abbreviatedCellText() + "|");
             }
         }
+        grid.append("\n");
 
         return grid.toString();
     }
@@ -104,6 +106,7 @@ public class Spreadsheet implements Grid {
     public Cell getCell(Location loc) {
         return spreadsheet[loc.getRow()][loc.getCol()];
     }
+
     @Override
     public int getRows() {
         return this.rows;

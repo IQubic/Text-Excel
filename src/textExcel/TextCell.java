@@ -10,7 +10,7 @@ public class TextCell implements Cell {
     @Override
     public String abbreviatedCellText() {
         if (this.value.length() < 10) {
-            return this.value;
+            return pad(this.value);
         } else {
             return this.value.substring(0, 10);
         }
@@ -19,5 +19,13 @@ public class TextCell implements Cell {
     @Override
     public String fullCellText() {
         return "\"" + this.value + "\"";
+    }
+
+    // Adds spaces to the end of a string, so that the string has 10 chars
+    private static String pad(String s) {
+        for (int i = s.length(); i < 10; i++) {
+            s += " ";
+        }
+        return s;
     }
 }

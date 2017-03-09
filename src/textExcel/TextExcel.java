@@ -8,6 +8,7 @@ public class TextExcel {
         // Initialization
         System.out.println("Welcome to TextExcel");
         Spreadsheet sheet = new Spreadsheet();
+
         Scanner in = new Scanner(System.in);
 
         // Main processing loop

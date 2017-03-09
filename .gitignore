@@ -1,6 +1,8 @@
+.class
 src/test
 build
 docs
 run
 build.gradle
 .gradle
+.gradletasknamecache

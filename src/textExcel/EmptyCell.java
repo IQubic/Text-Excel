@@ -1,10 +1,11 @@
 package textExcel;
 
-public class EmptyCell implements Cell {
-    public String abbreviatedCellText() {
-        return "          ";
+public class EmptyCell extends AbstractCell {
+    public EmptyCell() {
+        super("");
     }
 
+    @Override
     public String fullCellText() {
         return "";
     }

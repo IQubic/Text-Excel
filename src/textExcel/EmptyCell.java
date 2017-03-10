@@ -1,6 +1,6 @@
 package textExcel;
 
-public class EmptyCell extends AbstractCell {
+public class EmptyCell extends ACell {
     public EmptyCell() {
         super("");
     }

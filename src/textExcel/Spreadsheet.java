@@ -49,8 +49,13 @@ public class Spreadsheet implements Grid {
         if (value.contains("\"")) {
             // Substring extracts the String's text
             String contents = value.substring(1, value.length() - 1);
-            this.spreadsheet[loc.getRow()][loc.getCol()] = new TextCell(contents);
+            this.set(loc, new TextCell(contents));
         }
+    }
+
+    // loc now contains cell
+    private void set(Location loc, Cell cell)  {
+        this.spreadsheet[loc.getRow()][loc.getCol()] = cell;
     }
 
     // Sets every cell in the spreadsheet to an EmptyCell

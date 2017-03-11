@@ -1,12 +1,18 @@
 package textExcel;
 
 public class TextCell extends ACell {
-    public TextCell(String value) {
-        super(value);
+    private String text;
+
+    public TextCell(String text) {
+        this.text = text;
     }
 
     @Override
     public String fullCellText() {
-        return "\"" + super.getText() + "\"";
+        return "\"" +this.text + "\"";
+    }
+
+    public String abbreviatedCellText() {
+        return super.formatCellText(this.text);
     }
 }

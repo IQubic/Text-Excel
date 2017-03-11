@@ -9,6 +9,7 @@ public abstract class RealCell extends ACell {
     }
 
     // Sets the new value of this cell
+    // Only for use with formulaCells
     public void setDoubleValue(double Value) {
         this.value = value;
     }

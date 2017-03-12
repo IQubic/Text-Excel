@@ -50,6 +50,17 @@ public class Spreadsheet implements Grid {
             // Substring extracts the String's text
             String contents = value.substring(1, value.length() - 1);
             this.set(loc, new TextCell(contents));
+        // PercentCell
+        } else if (value.contains("%")) {
+            double percentValue = Double.parseDouble(value.substring(0, value.length() - 1));
+            this.set(loc, new PercentCell(percentValue));
+        // FormulaCell
+        } else if (value.contains("(")) {
+            String formula = value.substring(1, value.length() - 1);
+            this.set(loc, new FormulaCell(formula));
+        // ValueCell
+        } else {
+            this.set(loc, new ValueCell(Double.parseDouble(value)));
         }
     }
 

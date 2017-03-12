@@ -2,10 +2,10 @@ package textExcel;
 
 public abstract class RealCell extends ACell {
     // The value that will be returned by getDoubleValue
-    double value;
+    double doubleValue;
 
-    public RealCell(double value) {
-        this.value = value;
+    public RealCell(double doubleValue) {
+        this.doubleValue = doubleValue;
     }
 
     // Sets the new value of this cell

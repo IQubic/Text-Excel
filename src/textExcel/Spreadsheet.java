@@ -56,7 +56,7 @@ public class Spreadsheet implements Grid {
             this.set(loc, new PercentCell(percentValue));
         // FormulaCell
         } else if (value.contains("(")) {
-            String formula = value.substring(1, value.length() - 1);
+            String formula = value.substring(2, value.length() - 2);
             this.set(loc, new FormulaCell(formula));
         // ValueCell
         } else {

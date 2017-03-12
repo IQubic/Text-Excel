@@ -26,7 +26,7 @@ public class FormulaCell extends RealCell {
 
     @Override
     public String fullCellText() {
-        return "( " + formula + " )";
+        return formula;
     }
 
     @Override

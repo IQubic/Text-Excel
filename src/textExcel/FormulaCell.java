@@ -3,6 +3,7 @@ package textExcel;
 import java.util.ArrayList;
 
 public class FormulaCell extends RealCell {
+    // TODO Add a dependcy HashMap <String, Int>
     // formula should not contain parentheses
     private String formula;
     ArrayList<String> rpn;
@@ -16,6 +17,9 @@ public class FormulaCell extends RealCell {
         super.setDoubleValue(this.eval());
     }
 
+    // TODO Move to Spreadsheet.java
+    // TODO Create a HashMap at that time,
+    // to store the starting values of referenced cells
     private ArrayList<String> convertToRPN() {
         return new ArrayList<String>();
     }
@@ -26,7 +30,7 @@ public class FormulaCell extends RealCell {
 
     @Override
     public String fullCellText() {
-        return formula;
+        return "( " + formula + " )";
     }
 
     @Override

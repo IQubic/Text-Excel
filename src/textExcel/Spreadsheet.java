@@ -29,20 +29,20 @@ public class Spreadsheet implements Grid {
             String[] setCommand = command.split(" = ", 2);
             this.set(setCommand);
             output = this.getGridText();
-        // Clear all
-        } else if (command.equalsIgnoreCase("clear")) {
+         } else if (command.toLowerCase().contains("history")) {
+            // Don't log this command
+            logCommand = false;
+
+            // Grab the arguments to the history command
+            output = this.processHistoryCommand(command.split(" ", 2)[1].split(" "));
+       // Clear all
+        } else if (command.toLowerCase().equals("clear")) {
             this.clear();
             output = this.getGridText();
         // Clear a single cell
         } else if (command.toLowerCase().contains("clear")) {
             this.clear(new SpreadsheetLocation(command.substring(6)));
             output = this.getGridText();
-        } else if (command.toLowerCase().contains("history")) {
-            // Don't log this command
-            logCommand = false;
-
-            // Grab the arguments to the history command
-            output = this.processHistoryCommand(command.split(" ", 2)[1].split(" "));
         } else {
             output = "";
         }

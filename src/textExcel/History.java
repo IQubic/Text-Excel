@@ -34,7 +34,6 @@ public class History {
 
     // Adds an item to the array if we're currently tracking
     public void add(String command) {
-        System.out.println(size);
         if (this.tracking) {
             this.history.add(0, command);
 
@@ -48,8 +47,8 @@ public class History {
 
     // Removes the last amt items from the history
     public void clear(int amt) {
-        while (!history.isEmpty() && amt >= 1) {
-            history.remove(0);
+        while (!this.history.isEmpty() && amt > 0) {
+            this.history.remove(this.history.size() - 1);
             amt--;
         }
     }

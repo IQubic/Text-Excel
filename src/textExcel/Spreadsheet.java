@@ -9,33 +9,48 @@ public class Spreadsheet implements Grid {
         this.rows = 20;
         this.cols = 12;
         this.spreadsheet = new Cell[rows][cols];
+        History.getHistory().init();
         this.clear();
     }
 
     @Override
     public String processCommand(String command) {
+        // Variables for logging history
+        String output;
+        String originalCommand = command;
+        boolean logCommand = true;
         // Cell Inspection
         if (command.matches("[A-Za-z][0-9][0-9]?")){
             Cell cell = this.getCell(new SpreadsheetLocation(command));
-            return cell.fullCellText();
+            output = cell.fullCellText();
         // Assignment
         } else if (command.contains("=")) {
             // Seperate the cell and the contents
             String[] setCommand = command.split(" = ", 2);
             this.set(setCommand);
-            return this.getGridText();
+            output = this.getGridText();
         // Clear all
         } else if (command.equalsIgnoreCase("clear")) {
             this.clear();
-            return this.getGridText();
+            output = this.getGridText();
         // Clear a single cell
         } else if (command.toLowerCase().contains("clear")) {
             this.clear(new SpreadsheetLocation(command.substring(6)));
-            return this.getGridText();
-        // Something else was entered
+            output = this.getGridText();
+        } else if (command.toLowerCase().contains("history")) {
+            // Don't log this command
+            logCommand = false;
+
+            // Grab the arguments to the history command
+            output = this.processHistoryCommand(command.split(" ", 2)[1].split(" "));
         } else {
-            return "";
+            output = "";
         }
+
+        if (logCommand) {
+            History.getHistory().add(originalCommand);
+        }
+        return output;
     }
 
     // Sets the value of a cell
@@ -81,6 +96,25 @@ public class Spreadsheet implements Grid {
     // Sets just one cell to an EmptyCell
     private void clear(Location loc) {
         spreadsheet[loc.getRow()][loc.getCol()] = new EmptyCell();
+    }
+
+    public String processHistoryCommand(String[] command) {
+        // Default output
+        String output = "";
+        // Current History
+        History hist = History.getHistory();
+
+        // Process the command
+        if (command[0].equalsIgnoreCase("stop")) {
+            hist.stop();
+        } else if (command[0].equalsIgnoreCase("display")) {
+            output = hist.getContents();
+        } else if (command[0].toLowerCase().equals("start")) {
+            hist.start(Integer.parseInt(command[1]));
+        } else if (command[0].toLowerCase().equals("clear")) {
+            hist.clear(Integer.parseInt(command[1]));
+        }
+        return output;
     }
 
     @Override

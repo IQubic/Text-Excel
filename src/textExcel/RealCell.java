@@ -32,7 +32,11 @@ public abstract class RealCell extends ACell {
     }
 
     public double getDoubleValue() {
-        return this.doubleValue;
+        if (hasError) {
+            return Double.NaN;
+        } else {
+            return this.doubleValue;
+        }
     }
 
     public void setError(boolean hasError) {

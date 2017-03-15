@@ -32,9 +32,4 @@ public class FormulaCell extends RealCell {
     public String fullCellText() {
         return "( " + formula + " )";
     }
-
-    @Override
-    public String abbreviatedCellText() {
-        return super.formatCellText(Double.toString(super.getDoubleValue()));
-    }
 }

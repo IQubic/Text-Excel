@@ -9,9 +9,4 @@ public class ValueCell extends RealCell {
     public String fullCellText() {
         return Double.toString(super.getDoubleValue());
     }
-
-    @Override
-    public String abbreviatedCellText() {
-        return super.formatCellText(Double.toString(super.getDoubleValue()));
-    }
 }

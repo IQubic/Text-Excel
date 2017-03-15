@@ -9,7 +9,7 @@ public class TextCell extends ACell {
 
     @Override
     public String fullCellText() {
-        return "\"" +this.text + "\"";
+        return "\"" + this.text + "\"";
     }
 
     public String abbreviatedCellText() {

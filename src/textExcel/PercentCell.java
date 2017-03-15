@@ -17,6 +17,6 @@ public class PercentCell extends RealCell {
 
     @Override
     public String abbreviatedCellText() {
-        return super.formatCellText(((int) percentValue) + "%");
+        return super.abbreviatedCellText(((int) percentValue) + "%");
     }
 }

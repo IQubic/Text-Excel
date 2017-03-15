@@ -8,6 +8,6 @@ public class EmptyCell extends ACell {
 
     @Override
     public String abbreviatedCellText() {
-        return "          ";
+        return super.formatCellText("");
     }
 }

@@ -9,14 +9,14 @@ public class TextExcel {
         System.out.println("Welcome to TextExcel");
         Spreadsheet sheet = new Spreadsheet();
 
-        System.out.print(sheet.getGridText());
+        System.out.println(sheet.getGridText());
 
         Scanner in = new Scanner(System.in);
 
         // Main processing loop
         String command = in.nextLine();
         while (!command.equalsIgnoreCase("quit")) {
-            System.out.print(sheet.processCommand(command));
+            System.out.println(sheet.processCommand(command));
             command = in.nextLine();
         }
 

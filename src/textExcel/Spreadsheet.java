@@ -94,7 +94,7 @@ public class Spreadsheet implements Grid {
     private static FormulaCell createFormulaCell(String formula) {
         // START OF SHUNTING YARD ALGORITHM
         // Initialization for Shunting Yard Algorithm
-        String[] tokens = formula.split("\\s+");
+        String[] tokens = formula.split(" ");
 
         // Higher value means higher precedence
         Map<String, Integer> precedence = new HashMap<>();

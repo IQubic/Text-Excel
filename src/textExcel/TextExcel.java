@@ -15,7 +15,7 @@ public class TextExcel {
 
         // Main processing loop
         String command = in.nextLine();
-        while (!command.equalsIgnoreCase("quit")) {
+        while (!command.trim().equalsIgnoreCase("quit")) {
             System.out.println(sheet.processCommand(command));
             command = in.nextLine();
         }

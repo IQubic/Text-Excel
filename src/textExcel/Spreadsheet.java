@@ -21,6 +21,7 @@ public class Spreadsheet implements Grid {
         String output;
         String originalCommand = command;
         boolean logCommand = true;
+        command = command.trim();
         // Cell Inspection
         if (command.matches("[A-Za-z][0-9][0-9]?")){
             Cell cell = this.getCell(new SpreadsheetLocation(command));
@@ -28,7 +29,7 @@ public class Spreadsheet implements Grid {
         // Assignment
         } else if (command.contains("=")) {
             // Seperate the cell and the contents
-            String[] setCommand = command.split(" = ", 2);
+            String[] setCommand = command.split("\\s+=\\s+", 2);
             this.set(setCommand);
             output = this.getGridText();
          } else if (command.toLowerCase().contains("history")) {
@@ -36,7 +37,7 @@ public class Spreadsheet implements Grid {
             logCommand = false;
 
             // Grab the arguments to the history command
-            output = this.processHistoryCommand(command.split(" ", 2)[1].split(" "));
+            output = this.processHistoryCommand(command.split("\\s+", 2)[1].split("\\s+"));
        // Clear all
         } else if (command.toLowerCase().equals("clear")) {
             this.clear();
@@ -73,7 +74,8 @@ public class Spreadsheet implements Grid {
             this.set(loc, new PercentCell(percentValue));
         // FormulaCell
         } else if (value.contains("(")) {
-            String formula = value.substring(2, value.length() - 2);
+            // Extract just the formula rom the value string
+            String formula = value.split("\\(\\s+|\\s+\\)")[1];
             this.set(loc, Spreadsheet.createFormulaCell(formula));
         // ValueCell
         } else {
@@ -94,7 +96,7 @@ public class Spreadsheet implements Grid {
     private static FormulaCell createFormulaCell(String formula) {
         // START OF SHUNTING YARD ALGORITHM
         // Initialization for Shunting Yard Algorithm
-        String[] tokens = formula.split(" ");
+        String[] tokens = formula.split("\\s+");
 
         // Higher value means higher precedence
         Map<String, Integer> precedence = new HashMap<>();

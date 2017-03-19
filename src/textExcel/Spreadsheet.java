@@ -1,5 +1,7 @@
 package textExcel;
 
+import java.util.*;
+
 public class Spreadsheet implements Grid {
     private int rows;
     private int cols;
@@ -72,7 +74,7 @@ public class Spreadsheet implements Grid {
         // FormulaCell
         } else if (value.contains("(")) {
             String formula = value.substring(2, value.length() - 2);
-            this.set(loc, new FormulaCell(formula));
+            this.set(loc, Spreadsheet.createFormulaCell(formula));
         // ValueCell
         } else {
             this.set(loc, new ValueCell(Double.parseDouble(value)));
@@ -82,6 +84,54 @@ public class Spreadsheet implements Grid {
     // loc now contains cell
     private void set(Location loc, Cell cell)  {
         this.spreadsheet[loc.getRow()][loc.getCol()] = cell;
+    }
+
+    // Converts an equation string into rpn
+    // rpn conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
+    // Also creates a dependecy map
+    // and populates it with the current values.
+    // Finally it creates a formula cell
+    private static FormulaCell createFormulaCell(String formula) {
+        // START OF SHUNTING YARD ALGORITHM
+        // Initialization for Shunting Yard Algorithm
+        String[] tokens = formula.split("\\s+");
+
+        // Higher value means higher precedence
+        Map<String, Integer> precedence = new HashMap<>();
+        precedence.put("+", 1);
+        precedence.put("-", 1);
+        precedence.put("*", 2);
+        precedence.put("/", 2);
+        // A stack to use for the rpn conversion
+        Deque<String> opStack = new ArrayDeque<>();
+        // Final rpn output
+        List<String> rpn = new ArrayList<>(tokens.length);
+        // Dependency HashMap
+        // Will conatain the intial values of referenced cells
+        // TODO replace SOMETHING with an actual type
+        // Map<SOMETHING, Integer> dependecies = new HashMap<>();
+
+        // Start of Shunting Yard Algorithm
+        for (String curToken : tokens) {
+            // Token is either a number or a cell reference
+            if (!precedence.keySet().contains(curToken)) {
+                // TODO add depdency finding here
+                rpn.add(curToken);
+
+            // Token is a operator
+            } else {
+                while (!opStack.isEmpty() && precedence.get(curToken) <= precedence.get(opStack.peek())) {
+                    rpn.add(opStack.pop());
+                }
+                opStack.push(curToken);
+            } // END OF OPERATOR PARSING
+        }
+        // clear out the remaining operators
+        while (!opStack.isEmpty()) {
+            rpn.add(opStack.pop());
+        }
+        // END OF SHUNTING YARD ALGORITHM
+        return new FormulaCell(formula, rpn);
     }
 
     // Sets every cell in the spreadsheet to an EmptyCell
@@ -98,6 +148,7 @@ public class Spreadsheet implements Grid {
         spreadsheet[loc.getRow()][loc.getCol()] = new EmptyCell();
     }
 
+    // Processes a history command and sends it to the history object
     public String processHistoryCommand(String[] command) {
         // Default output
         String output = "";

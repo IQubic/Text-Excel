@@ -14,7 +14,7 @@ public abstract class RealCell extends ACell {
 
     @Override
     public String abbreviatedCellText() {
-        return this.formatCellText(Double.toString(this.doubleValue));
+        return this.formatCellText(Double.toString(this.getDoubleValue()));
     }
 
     public String abbreviatedCellText(String text) {
@@ -23,12 +23,6 @@ public abstract class RealCell extends ACell {
         } else {
             return super.formatCellText(text);
         }
-    }
-
-    // Sets the new value of this cell
-    // Only for use with formulaCells
-    public void setDoubleValue(double doubleValue) {
-        this.doubleValue = doubleValue;
     }
 
     public double getDoubleValue() {

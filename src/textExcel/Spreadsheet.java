@@ -76,7 +76,7 @@ public class Spreadsheet implements Grid {
         } else if (value.contains("(")) {
             // Extract just the formula rom the value string
             String formula = value.split("\\(\\s+|\\s+\\)")[1];
-            this.set(loc, Spreadsheet.createFormulaCell(formula));
+            this.set(loc, FormulaCell.createFormulaCell(formula, this));
         // ValueCell
         } else {
             this.set(loc, new ValueCell(Double.parseDouble(value)));
@@ -86,54 +86,6 @@ public class Spreadsheet implements Grid {
     // loc now contains cell
     private void set(Location loc, Cell cell)  {
         this.spreadsheet[loc.getRow()][loc.getCol()] = cell;
-    }
-
-    // Converts an equation string into rpn
-    // rpn conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
-    // Also creates a dependecy map
-    // and populates it with the current values.
-    // Finally it creates a formula cell
-    private static FormulaCell createFormulaCell(String formula) {
-        // START OF SHUNTING YARD ALGORITHM
-        // Initialization for Shunting Yard Algorithm
-        String[] tokens = formula.split("\\s+");
-
-        // Higher value means higher precedence
-        Map<String, Integer> precedence = new HashMap<>();
-        precedence.put("+", 1);
-        precedence.put("-", 1);
-        precedence.put("*", 2);
-        precedence.put("/", 2);
-        // A stack to use for the rpn conversion
-        Deque<String> opStack = new ArrayDeque<>();
-        // Final rpn output
-        List<String> rpn = new ArrayList<>(tokens.length);
-        // Dependency HashMap
-        // Will conatain the intial values of referenced cells
-        // TODO replace SOMETHING with an actual type
-        // Map<SOMETHING, Integer> dependecies = new HashMap<>();
-
-        // Start of Shunting Yard Algorithm
-        for (String curToken : tokens) {
-            // Token is either a number or a cell reference
-            if (!precedence.keySet().contains(curToken)) {
-                // TODO add depdency finding here
-                rpn.add(curToken);
-
-            // Token is a operator
-            } else {
-                while (!opStack.isEmpty() && precedence.get(curToken) <= precedence.get(opStack.peek())) {
-                    rpn.add(opStack.pop());
-                }
-                opStack.push(curToken);
-            } // END OF OPERATOR PARSING
-        }
-        // clear out the remaining operators
-        while (!opStack.isEmpty()) {
-            rpn.add(opStack.pop());
-        }
-        // END OF SHUNTING YARD ALGORITHM
-        return new FormulaCell(formula, rpn);
     }
 
     // Sets every cell in the spreadsheet to an EmptyCell

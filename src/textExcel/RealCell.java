@@ -1,7 +1,6 @@
 package textExcel;
 
 public abstract class RealCell extends ACell {
-    // The exact value that will be returned by getDoubleValue
     private double doubleValue;
     private boolean hasError;
 
@@ -14,7 +13,16 @@ public abstract class RealCell extends ACell {
 
     @Override
     public String abbreviatedCellText() {
-        return this.formatCellText(Double.toString(this.getDoubleValue()));
+        // hasError is set properly during the getDoubleValue method call
+        double value = this.getDoubleValue();
+
+        // Has an error
+        if (this.hasError) {
+            return super.formatCellText("#ERROR");
+        }
+
+        // No error
+        return super.formatCellText(Double.toString(value));
     }
 
     public String abbreviatedCellText(String text) {
@@ -26,14 +34,10 @@ public abstract class RealCell extends ACell {
     }
 
     public double getDoubleValue() {
-        if (hasError) {
-            return Double.NaN;
-        } else {
             return this.doubleValue;
-        }
     }
 
-    public void setError(boolean hasError) {
+    public void setErrorState(boolean hasError) {
         this.hasError = hasError;
     }
 

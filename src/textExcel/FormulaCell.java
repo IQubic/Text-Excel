@@ -7,23 +7,16 @@ public class FormulaCell extends RealCell {
     private List<String> rpn;
     private Spreadsheet sheetRef;
 
-    // Only way to get a FormulaCell is with createFormulaCell
     // super.doubleValue is never used, as getDoubleValue is overridden here
-    private FormulaCell(String formula, List<String> rpn, Spreadsheet sheetRef) {
+    public FormulaCell(String formula, Spreadsheet sheetRef) {
         super(0);
         this.formula = formula;
-        this.rpn = rpn;
+        this.rpn = convertToRPN(formula);
         this.sheetRef = sheetRef;
     }
 
-    // TODO Add method formula support
-    public static FormulaCell createFormulaCell(String formula, Spreadsheet sheetRef) {
-        List<String> rpn = convertToRPN(formula);
-        return new FormulaCell(formula, rpn, sheetRef);
-    }
-
     // Converts an equation string into rpn
-    // rpn conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
+    // RPN conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
     private static List<String> convertToRPN(String formula) {
         String[] tokens = formula.split("\\s+");
         List<String> rpn = new ArrayList<>(tokens.length);
@@ -61,14 +54,14 @@ public class FormulaCell extends RealCell {
     }
 
     // Evaluates the formula stored in this cell
-    // TODO Add cell refernce support
-    private double eval() {
+    // TODO Add circular dependency support
+    private double eval() throws IllegalArgumentException {
         Deque<Double> evalStack = new ArrayDeque<>();
 
         for (String token : this.rpn) {
             // Next token is a number
             if (!isOperator(token)) {
-                evalStack.push(Double.parseDouble(token));
+                evalStack.push(this.tokenToDouble(token));
 
             // Token is a operation
             } else {
@@ -101,6 +94,27 @@ public class FormulaCell extends RealCell {
         return result;
     }
 
+    // Converts a token like "5", "13", or "A1" to the correct double value
+    // TODO Add circular dependency support
+    private double tokenToDouble(String token) throws IllegalArgumentException {
+        // Token is a number
+        if (!token.matches("[A-Za-z][0-9][0-9]?")){
+            return Double.parseDouble(token);
+        }
+
+        // Token is a cell reference
+        Location loc = new SpreadsheetLocation(token);
+        Cell curCell = sheetRef.getCell(loc);
+
+        // Formula refers to something that is not a RealCell
+        if (!(curCell instanceof RealCell)) {
+            throw new IllegalArgumentException();
+        }
+
+        // curCell is a RealCell
+        return ((RealCell) curCell).getDoubleValue();
+    }
+
     // Returns true if token is an operator
     private static boolean isOperator(String token) {
         boolean isOperator = false;
@@ -120,11 +134,13 @@ public class FormulaCell extends RealCell {
 
     @Override
     public double getDoubleValue() {
-        System.out.println("TEST");
-        if (super.hasError()) {
+        try {
+            double value = this.eval();
+            super.setErrorState(false);
+            return value;
+        } catch (IllegalArgumentException e) {
+            super.setErrorState(true);
             return Double.NaN;
-        } else {
-            return this.eval();
         }
     }
 

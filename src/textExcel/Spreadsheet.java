@@ -76,7 +76,7 @@ public class Spreadsheet implements Grid {
         } else if (value.contains("(")) {
             // Extract just the formula rom the value string
             String formula = value.split("\\(\\s+|\\s+\\)")[1];
-            this.set(loc, FormulaCell.createFormulaCell(formula, this));
+            this.set(loc, new FormulaCell(formula, this));
         // ValueCell
         } else {
             this.set(loc, new ValueCell(Double.parseDouble(value)));

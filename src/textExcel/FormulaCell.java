@@ -9,8 +9,9 @@ public class FormulaCell extends RealCell {
 
     // super.doubleValue is never used, as getDoubleValue is overridden here
     public FormulaCell(String formula, Spreadsheet sheetRef) {
-        super(0);
-        this.formula = formula;
+        // This field is never used in a formula cell
+        super(Double.NaN);
+        this.formula = formula.toUpperCase();
         this.rpn = convertToRPN(formula);
         this.sheetRef = sheetRef;
     }

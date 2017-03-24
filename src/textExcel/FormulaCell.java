@@ -61,11 +61,7 @@ public class FormulaCell extends RealCell {
         for (String token : this.rpn) {
             // Next token is a number or cell reference
             if (!isOperator(token)) {
-                double value = this.tokenToDouble(token);
-                if (Double.isNaN(value)) {
-                    throw new IllegalArgumentException();
-                }
-                evalStack.push(value);
+                evalStack.push(this.tokenToDouble(token));
 
             // Token is a operation
             } else {
@@ -121,7 +117,15 @@ public class FormulaCell extends RealCell {
         }
 
         // curCell is a RealCell
-        return ((RealCell) curCell).getDoubleValue();
+        RealCell curRealCell = (RealCell) curCell;
+        double value = curRealCell.getDoubleValue();
+
+        // Make sure curCell doesn't have an error
+        if (curRealCell.hasError()) {
+            throw new IllegalArgumentException();
+        }
+
+        return value;
     }
 
     // Returns true if token is an operator

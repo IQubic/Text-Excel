@@ -59,9 +59,13 @@ public class FormulaCell extends RealCell {
         Deque<Double> evalStack = new ArrayDeque<>();
 
         for (String token : this.rpn) {
-            // Next token is a number
+            // Next token is a number or cell reference
             if (!isOperator(token)) {
-                evalStack.push(this.tokenToDouble(token));
+                double value = this.tokenToDouble(token);
+                if (Double.isNaN(value)) {
+                    throw new IllegalArgumentException();
+                }
+                evalStack.push(value);
 
             // Token is a operation
             } else {
@@ -75,7 +79,7 @@ public class FormulaCell extends RealCell {
     }
 
     // Evaluates a two operand math expression
-    private static double eval(double num1, double num2, char op) {
+    private static double eval(double num1, double num2, char op) throws IllegalArgumentException {
         double result = 0;
         switch (op) {
             case '+':
@@ -88,13 +92,18 @@ public class FormulaCell extends RealCell {
                 result = num1 * num2;
                 break;
             case '/':
+                // Check for divide by zero
+                if (num2 == 0) {
+                    throw new IllegalArgumentException();
+                }
+
                 result = num1 / num2;
                 break;
         }
         return result;
     }
 
-    // Converts a token like "5", "13", or "A1" to the correct double value
+    // Converts a token like "5", "13", "A1", or "b12" to the correct double value
     // TODO Add circular dependency support
     private double tokenToDouble(String token) throws IllegalArgumentException {
         // Token is a number

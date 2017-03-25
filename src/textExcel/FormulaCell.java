@@ -41,8 +41,8 @@ public class FormulaCell extends RealCell {
                 // Token is a range
                 if (curToken.contains("-")) {
                     String[] corners = curToken.split("-");
-                    rpn.add(corners[0]);
                     rpn.add(corners[1]);
+                    rpn.add(corners[0]);
 
                 // Token is number or a cell reference
                 } else {
@@ -78,14 +78,18 @@ public class FormulaCell extends RealCell {
 
             // Token is a operation
             } else {
+                // Token is a method formula
                 if (token.equals("SUM") || token.equals("AVG")) {
                     Location ULCorner = new SpreadsheetLocation(evalStack.pop());
                     Location DRCorner = new SpreadsheetLocation(evalStack.pop());
                     evalStack.push(Double.toString(this.methodFormula(ULCorner, DRCorner, token)));
+
+                // Token is a mathematical operator
+                } else {
+                    double num2 = this.tokenToDouble(evalStack.pop());
+                    double num1 = this.tokenToDouble(evalStack.pop());
+                    evalStack.push(Double.toString(this.eval(num1, num2, token)));
                 }
-                double num2 = this.tokenToDouble(evalStack.pop());
-                double num1 = this.tokenToDouble(evalStack.pop());
-                evalStack.push(Double.toString(this.eval(num1, num2, token)));
             }
         }
 
@@ -131,12 +135,37 @@ public class FormulaCell extends RealCell {
         return result;
     }
 
+    // Calculates the sum of a region
     private double sum(Location ULCorner, Location DRCorner) throws IllegalArgumentException {
-
+        double total = 0;
+        List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
+        for (Location loc : locs) {
+            total += this.locToDouble(loc);
+        }
+        return total;
     }
 
+    // calculates the avg of a region
     private double avg(Location ULCorner, Location DRCorner) throws IllegalArgumentException {
+        double total = 0;
+        List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
+        for (Location loc : locs) {
+            total += this.locToDouble(loc);
+        }
+        return total / locs.size();
+    }
 
+    // Returns a list of all the locations in a given region
+    private List<Location> getLocsInRegion(Location ULCorner, Location DRCorner) {
+        List<Location> locs = new ArrayList<>();
+        // Iterate through the region
+        for (int row = ULCorner.getRow(); row <= DRCorner.getRow(); row++) {
+            for (int col = ULCorner.getCol(); col <= DRCorner.getCol(); col++) {
+                locs.add(new SpreadsheetLocation(row, col));
+            }
+        }
+
+        return locs;
     }
 
     // Converts a token like "5", "13", "A1", or "b12" to the correct double value

@@ -39,7 +39,7 @@ public class FormulaCell extends RealCell {
             // Token is either a number, a cell reference or a range
             if (!precedence.keySet().contains(curToken)) {
                 // Token is a range
-                if (curToken.contains("-")) {
+                if (curToken.matches("[A-Z][0-9][0-9]?-[A-Z][0-9][0-9]?")) {
                     String[] corners = curToken.split("-");
                     rpn.add(corners[1]);
                     rpn.add(corners[0]);
@@ -92,7 +92,6 @@ public class FormulaCell extends RealCell {
                 }
             }
         }
-
         return Double.parseDouble(evalStack.pop());
     }
 

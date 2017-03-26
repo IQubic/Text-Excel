@@ -1,6 +1,6 @@
 package textExcel;
 
-public class PercentCell extends RealCell {
+public class PercentCell extends ValueCell {
     // percent is a value like 50.4
     private double percentValue;
 
@@ -17,6 +17,6 @@ public class PercentCell extends RealCell {
 
     @Override
     public String abbreviatedCellText() {
-        return super.abbreviatedCellText(((int) percentValue) + "%");
+        return super.formatCellText(((int) percentValue) + "%");
     }
 }

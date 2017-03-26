@@ -10,7 +10,6 @@ public class FormulaCell extends RealCell {
     // super.doubleValue is never used, as getDoubleValue is overridden here
     public FormulaCell(String formula, Spreadsheet sheetRef) {
         // This field is never used in a formula cell
-        super(Double.NaN);
         this.formula = formula.toUpperCase();
         // Use the uppercase form
         this.rpn = convertToRPN(this.formula);
@@ -68,7 +67,8 @@ public class FormulaCell extends RealCell {
 
     // Evaluates the formula stored in this cell
     // TODO Add circular dependency support
-    private double eval() throws IllegalArgumentException {
+    @Override
+    public double getDoubleValue() throws IllegalArgumentException {
         Deque<String> evalStack = new ArrayDeque<>();
 
         for (String token : this.rpn) {
@@ -189,15 +189,7 @@ public class FormulaCell extends RealCell {
         }
 
         // curCell is a RealCell
-        RealCell curRealCell = (RealCell) curCell;
-        double value = curRealCell.getDoubleValue();
-
-        // Make sure curCell doesn't have an error
-        if (curRealCell.hasError()) {
-            throw new IllegalArgumentException();
-        }
-
-        return value;
+        return ((RealCell) curCell).getDoubleValue();
     }
 
     // Returns true if token is an operator
@@ -220,18 +212,6 @@ public class FormulaCell extends RealCell {
 
         return isOperator;
  }
-
-    @Override
-    public double getDoubleValue() {
-        try {
-            double value = this.eval();
-            super.setErrorState(false);
-            return value;
-        } catch (IllegalArgumentException e) {
-            super.setErrorState(true);
-            return Double.NaN;
-        }
-    }
 
     @Override
     public String fullCellText() {

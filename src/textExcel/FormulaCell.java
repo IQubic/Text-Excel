@@ -10,7 +10,7 @@ public class FormulaCell extends RealCell {
     // super.doubleValue is never used, as getDoubleValue is overridden here
     public FormulaCell(String formula, Spreadsheet sheetRef) {
         // This field is never used in a formula cell
-        this.formula = formula.toUpperCase();
+        this.formula = formula;
         // Use the uppercase form
         this.rpn = convertToRPN(this.formula);
         this.sheetRef = sheetRef;
@@ -36,16 +36,15 @@ public class FormulaCell extends RealCell {
         // Start of Shunting Yard Algorithm
         for (String curToken : tokens) {
             // Token is either a number, a cell reference or a range
-            if (!precedence.keySet().contains(curToken)) {
+            if (!isOperator(curToken)) {
                 // Token is a range
-                if (curToken.matches("[A-Z][0-9][0-9]?-[A-Z][0-9][0-9]?")) {
+                if (curToken.matches("[a-zA-Z][0-9][0-9]?-[a-zA-Z][0-9][0-9]?")) {
                     String[] corners = curToken.split("-");
                     rpn.add(corners[1]);
                     rpn.add(corners[0]);
 
                 // Token is number or a cell reference
                 } else {
-                    // TODO add depdency finding here
                     rpn.add(curToken);
                 }
 
@@ -65,12 +64,21 @@ public class FormulaCell extends RealCell {
         return rpn;
     }
 
-    // Evaluates the formula stored in this cell
-    // TODO Add circular dependency support
     @Override
     public double getDoubleValue() throws IllegalArgumentException {
-        Deque<String> evalStack = new ArrayDeque<>();
+        List<RealCell> callStack = new ArrayList<>();
+        return this.getDoubleValue(callStack);
+    }
 
+    // Evaluates the formula stored in this cell
+    @Override
+    public double getDoubleValue(List<RealCell> callStack) throws IllegalArgumentException {
+        if (callStack.contains(this)) {
+            throw new IllegalArgumentException();
+        }
+        callStack.add(this);
+
+        Deque<String> evalStack = new ArrayDeque<>();
         for (String token : this.rpn) {
             // Next token is a number or cell reference
             if (!isOperator(token)) {
@@ -79,20 +87,23 @@ public class FormulaCell extends RealCell {
             // Token is a operation
             } else {
                 // Token is a method formula
-                if (token.equals("SUM") || token.equals("AVG")) {
+                if (token.equalsIgnoreCase("sum") || token.equalsIgnoreCase("avg")) {
                     Location ULCorner = new SpreadsheetLocation(evalStack.pop());
                     Location DRCorner = new SpreadsheetLocation(evalStack.pop());
-                    evalStack.push(Double.toString(this.methodFormula(ULCorner, DRCorner, token)));
+                    evalStack.push(Double.toString(this.methodFormula(ULCorner, DRCorner, token, callStack)));
 
                 // Token is a mathematical operator
                 } else {
-                    double num2 = this.tokenToDouble(evalStack.pop());
-                    double num1 = this.tokenToDouble(evalStack.pop());
+                    double num2 = this.tokenToDouble(evalStack.pop(), callStack);
+                    double num1 = this.tokenToDouble(evalStack.pop(), callStack);
                     evalStack.push(Double.toString(this.eval(num1, num2, token)));
                 }
             }
         }
-        return Double.parseDouble(evalStack.pop());
+
+        double finalValue = tokenToDouble(evalStack.pop(), callStack);
+        callStack.remove(this);
+        return finalValue;
     }
 
     // Evaluates a two operand math expression
@@ -121,35 +132,33 @@ public class FormulaCell extends RealCell {
     }
 
     // Evalutes a method forumula
-    private double methodFormula(Location ULCorner, Location DRCorner, String op) throws IllegalArgumentException {
+    private double methodFormula(Location ULCorner, Location DRCorner, String op, List<RealCell> callStack) throws IllegalArgumentException {
         double result = 0;
-        switch (op) {
-            case "SUM":
-                result = this.sum(ULCorner, DRCorner);
-                break;
-            case "AVG":
-                result = this.avg(ULCorner, DRCorner);
-                break;
+        if (op.equalsIgnoreCase("sum")) {
+            result = this.sum(ULCorner, DRCorner, callStack);
+        } else if (op.equalsIgnoreCase("avg")) {
+            System.out.println("AVG");
+            result = this.avg(ULCorner, DRCorner, callStack);
         }
         return result;
     }
 
     // Calculates the sum of a region
-    private double sum(Location ULCorner, Location DRCorner) throws IllegalArgumentException {
+    private double sum(Location ULCorner, Location DRCorner, List<RealCell> callStack) throws IllegalArgumentException {
         double total = 0;
         List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
         for (Location loc : locs) {
-            total += this.locToDouble(loc);
+            total += this.locToDouble(loc, callStack);
         }
         return total;
     }
 
     // calculates the avg of a region
-    private double avg(Location ULCorner, Location DRCorner) throws IllegalArgumentException {
+    private double avg(Location ULCorner, Location DRCorner, List<RealCell> callStack) throws IllegalArgumentException {
         double total = 0;
         List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
         for (Location loc : locs) {
-            total += this.locToDouble(loc);
+            total += this.locToDouble(loc, callStack);
         }
         return total / locs.size();
     }
@@ -168,19 +177,18 @@ public class FormulaCell extends RealCell {
     }
 
     // Converts a token like "5", "13", "A1", or "b12" to the correct double value
-    // TODO Add circular dependency support
-    private double tokenToDouble(String token) throws IllegalArgumentException {
+    private double tokenToDouble(String token, List<RealCell> callStack) throws IllegalArgumentException {
         // Token is a number
         if (!token.matches("[A-Za-z][0-9][0-9]?")){
             return Double.parseDouble(token);
         }
 
         // Token is a cell reference
-        return this.locToDouble(new SpreadsheetLocation(token));
+        return this.locToDouble(new SpreadsheetLocation(token), callStack);
    }
 
     // Gets the value of the cell at loc
-    private double locToDouble(Location loc) throws IllegalArgumentException {
+    private double locToDouble(Location loc, List<RealCell> callStack) throws IllegalArgumentException {
         Cell curCell = sheetRef.getCell(loc);
 
         // Formula refers to something that is not a RealCell
@@ -189,7 +197,7 @@ public class FormulaCell extends RealCell {
         }
 
         // curCell is a RealCell
-        return ((RealCell) curCell).getDoubleValue();
+        return ((RealCell) curCell).getDoubleValue(callStack);
     }
 
     // Returns true if token is an operator
@@ -204,9 +212,9 @@ public class FormulaCell extends RealCell {
             isOperator = true;
         } else if (token.equals("/")) {
             isOperator = true;
-        } else if (token.equals("SUM")) {
+        } else if (token.equalsIgnoreCase("sum")) {
             isOperator = true;
-        } else if (token.equals("AVG")) {
+        } else if (token.equalsIgnoreCase("avg")) {
             isOperator = true;
         }
 

@@ -1,5 +1,7 @@
 package textExcel;
 
+import java.util.List;
+
 public abstract class RealCell extends ACell {
 
     @Override
@@ -15,4 +17,6 @@ public abstract class RealCell extends ACell {
     }
 
     public abstract double getDoubleValue();
+
+    public abstract double getDoubleValue(List<RealCell> callStack);
 }

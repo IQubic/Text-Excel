@@ -1,5 +1,7 @@
 package textExcel;
 
+import java.util.List;
+
 public class ValueCell extends RealCell {
     private double doubleValue;
 
@@ -14,6 +16,11 @@ public class ValueCell extends RealCell {
 
     @Override
     public double getDoubleValue() {
+        return this.doubleValue;
+    }
+
+    @Override
+    public double getDoubleValue(List<RealCell> callStack) {
         return this.doubleValue;
     }
 }

@@ -157,6 +157,26 @@ public class Spreadsheet implements Grid {
         return s;
     }
 
+    // Returns a list of all the locations in a given region
+    public static Location[] getLocsInRegion(Location ULCorner, Location DRCorner) {
+        Location[] locs = new Location[getRegionSize(ULCorner, DRCorner)];
+
+        // Iterate through the region
+        int locNum = 0;
+        for (int row = ULCorner.getRow(); row <= DRCorner.getRow(); row++) {
+            for (int col = ULCorner.getCol(); col <= DRCorner.getCol(); col++) {
+                locs[locNum] = new SpreadsheetLocation(row, col);
+                locNum++;
+            }
+        }
+
+        return locs;
+    }
+
+    public static int getRegionSize(Location ULCorner, Location DRCorner) {
+        return ((DRCorner.getRow() - ULCorner.getRow() + 1) * (DRCorner.getCol() - ULCorner.getCol() + 1));
+    }
+
     @Override
     public Cell getCell(Location loc) {
         return spreadsheet[loc.getRow()][loc.getCol()];

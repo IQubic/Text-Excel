@@ -19,7 +19,7 @@ public class FormulaCell extends RealCell {
     // Converts an equation string into rpn
     // RPN conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
     private static List<String> convertToRPN(String formula) {
-        String[] tokens = formula.split("\\s+");
+        String[] tokens = formula.toLowerCase().split("\\s+");
         List<String> rpn = new ArrayList<>(tokens.length);
 
         // Higher value means higher precedence
@@ -28,32 +28,23 @@ public class FormulaCell extends RealCell {
         precedence.put("-", 1);
         precedence.put("*", 2);
         precedence.put("/", 2);
-        precedence.put("SUM", 3);
-        precedence.put("AVG", 3);
+        precedence.put("sum", 3);
+        precedence.put("avg", 3);
         // A stack to use for the rpn conversion
         Deque<String> opStack = new ArrayDeque<>();
 
         // Start of Shunting Yard Algorithm
-        for (String curToken : tokens) {
+        for (String token : tokens) {
             // Token is either a number, a cell reference or a range
-            if (!isOperator(curToken)) {
-                // Token is a range
-                if (curToken.matches("[a-zA-Z][0-9][0-9]?-[a-zA-Z][0-9][0-9]?")) {
-                    String[] corners = curToken.split("-");
-                    rpn.add(corners[1]);
-                    rpn.add(corners[0]);
-
-                // Token is number or a cell reference
-                } else {
-                    rpn.add(curToken);
-                }
+            if (!isOperator(token)) {
+                rpn.add(token);
 
             // Token is a operator
             } else {
-                while (!opStack.isEmpty() && precedence.get(curToken) <= precedence.get(opStack.peek())) {
+                while (!opStack.isEmpty() && precedence.get(token) <= precedence.get(opStack.peek())) {
                     rpn.add(opStack.pop());
                 }
-                opStack.push(curToken);
+                opStack.push(token);
             } // END OF OPERATOR PARSING
         }
         // clear out the remaining operators
@@ -88,9 +79,8 @@ public class FormulaCell extends RealCell {
             } else {
                 // Token is a method formula
                 if (token.equalsIgnoreCase("sum") || token.equalsIgnoreCase("avg")) {
-                    Location ULCorner = new SpreadsheetLocation(evalStack.pop());
-                    Location DRCorner = new SpreadsheetLocation(evalStack.pop());
-                    evalStack.push(Double.toString(this.methodFormula(ULCorner, DRCorner, token, callStack)));
+                    String range = evalStack.pop();
+                    evalStack.push(Double.toString(this.methodFormula(range, token, callStack)));
 
                 // Token is a mathematical operator
                 } else {
@@ -132,7 +122,10 @@ public class FormulaCell extends RealCell {
     }
 
     // Evalutes a method forumula
-    private double methodFormula(Location ULCorner, Location DRCorner, String op, Deque<RealCell> callStack) throws IllegalArgumentException {
+    private double methodFormula(String range, String op, Deque<RealCell> callStack) throws IllegalArgumentException {
+        String[] locs = range.split("-");
+        Location ULCorner = new SpreadsheetLocation(locs[0]);
+        Location DRCorner = new SpreadsheetLocation(locs[1]);
         double result = 0;
         if (op.equalsIgnoreCase("sum")) {
             result = this.sum(ULCorner, DRCorner, callStack);
@@ -145,7 +138,7 @@ public class FormulaCell extends RealCell {
     // Calculates the sum of a region
     private double sum(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
         double total = 0;
-        List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
+        Location[] locs = Spreadsheet.getLocsInRegion(ULCorner, DRCorner);
         for (Location loc : locs) {
             total += this.locToDouble(loc, callStack);
         }
@@ -154,25 +147,7 @@ public class FormulaCell extends RealCell {
 
     // calculates the avg of a region
     private double avg(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
-        double total = 0;
-        List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
-        for (Location loc : locs) {
-            total += this.locToDouble(loc, callStack);
-        }
-        return total / locs.size();
-    }
-
-    // Returns a list of all the locations in a given region
-    private List<Location> getLocsInRegion(Location ULCorner, Location DRCorner) {
-        List<Location> locs = new ArrayList<>();
-        // Iterate through the region
-        for (int row = ULCorner.getRow(); row <= DRCorner.getRow(); row++) {
-            for (int col = ULCorner.getCol(); col <= DRCorner.getCol(); col++) {
-                locs.add(new SpreadsheetLocation(row, col));
-            }
-        }
-
-        return locs;
+        return this.sum(ULCorner, DRCorner, callStack) / Spreadsheet.getRegionSize(ULCorner, DRCorner);
     }
 
     // Converts a token like "5", "13", "A1", or "b12" to the correct double value

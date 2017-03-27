@@ -137,7 +137,6 @@ public class FormulaCell extends RealCell {
         if (op.equalsIgnoreCase("sum")) {
             result = this.sum(ULCorner, DRCorner, callStack);
         } else if (op.equalsIgnoreCase("avg")) {
-            System.out.println("AVG");
             result = this.avg(ULCorner, DRCorner, callStack);
         }
         return result;

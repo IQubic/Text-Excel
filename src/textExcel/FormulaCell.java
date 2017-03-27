@@ -66,17 +66,17 @@ public class FormulaCell extends RealCell {
 
     @Override
     public double getDoubleValue() throws IllegalArgumentException {
-        List<RealCell> callStack = new ArrayList<>();
+        Deque<RealCell> callStack = new ArrayDeque<>();
         return this.getDoubleValue(callStack);
     }
 
     // Evaluates the formula stored in this cell
     @Override
-    public double getDoubleValue(List<RealCell> callStack) throws IllegalArgumentException {
+    public double getDoubleValue(Deque<RealCell> callStack) throws IllegalArgumentException {
         if (callStack.contains(this)) {
             throw new IllegalArgumentException();
         }
-        callStack.add(this);
+        callStack.push(this);
 
         Deque<String> evalStack = new ArrayDeque<>();
         for (String token : this.rpn) {
@@ -102,7 +102,7 @@ public class FormulaCell extends RealCell {
         }
 
         double finalValue = tokenToDouble(evalStack.pop(), callStack);
-        callStack.remove(this);
+        callStack.pop();
         return finalValue;
     }
 
@@ -132,7 +132,7 @@ public class FormulaCell extends RealCell {
     }
 
     // Evalutes a method forumula
-    private double methodFormula(Location ULCorner, Location DRCorner, String op, List<RealCell> callStack) throws IllegalArgumentException {
+    private double methodFormula(Location ULCorner, Location DRCorner, String op, Deque<RealCell> callStack) throws IllegalArgumentException {
         double result = 0;
         if (op.equalsIgnoreCase("sum")) {
             result = this.sum(ULCorner, DRCorner, callStack);
@@ -143,7 +143,7 @@ public class FormulaCell extends RealCell {
     }
 
     // Calculates the sum of a region
-    private double sum(Location ULCorner, Location DRCorner, List<RealCell> callStack) throws IllegalArgumentException {
+    private double sum(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
         double total = 0;
         List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
         for (Location loc : locs) {
@@ -153,7 +153,7 @@ public class FormulaCell extends RealCell {
     }
 
     // calculates the avg of a region
-    private double avg(Location ULCorner, Location DRCorner, List<RealCell> callStack) throws IllegalArgumentException {
+    private double avg(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
         double total = 0;
         List<Location> locs = this.getLocsInRegion(ULCorner, DRCorner);
         for (Location loc : locs) {
@@ -176,7 +176,7 @@ public class FormulaCell extends RealCell {
     }
 
     // Converts a token like "5", "13", "A1", or "b12" to the correct double value
-    private double tokenToDouble(String token, List<RealCell> callStack) throws IllegalArgumentException {
+    private double tokenToDouble(String token, Deque<RealCell> callStack) throws IllegalArgumentException {
         // Token is a number
         if (!token.matches("[A-Za-z][0-9][0-9]?")){
             return Double.parseDouble(token);
@@ -187,7 +187,7 @@ public class FormulaCell extends RealCell {
    }
 
     // Gets the value of the cell at loc
-    private double locToDouble(Location loc, List<RealCell> callStack) throws IllegalArgumentException {
+    private double locToDouble(Location loc, Deque<RealCell> callStack) throws IllegalArgumentException {
         Cell curCell = sheetRef.getCell(loc);
 
         // Formula refers to something that is not a RealCell

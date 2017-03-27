@@ -1,6 +1,6 @@
 package textExcel;
 
-import java.util.List;
+import java.util.Deque;
 
 public abstract class RealCell extends ACell {
 
@@ -18,5 +18,5 @@ public abstract class RealCell extends ACell {
 
     public abstract double getDoubleValue();
 
-    public abstract double getDoubleValue(List<RealCell> callStack);
+    public abstract double getDoubleValue(Deque<RealCell> callStack);
 }

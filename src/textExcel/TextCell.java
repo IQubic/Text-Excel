@@ -12,7 +12,19 @@ public class TextCell extends ACell {
         return "\"" + this.text + "\"";
     }
 
+    @Override
     public String abbreviatedCellText() {
         return super.formatCellText(this.text);
+    }
+
+    @Override
+    public int compareTo(ACell other) {
+        if (other instanceof EmptyCell) {
+            return 1;
+        }
+        if (other instanceof RealCell) {
+            return -1;
+        }
+        return this.text.compareTo(((TextCell) other).text);
     }
 }

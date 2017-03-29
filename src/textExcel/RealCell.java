@@ -19,4 +19,13 @@ public abstract class RealCell extends ACell {
     public abstract double getDoubleValue();
 
     public abstract double getDoubleValue(Deque<RealCell> callStack);
+
+    //TODO Implement RealCell compared to RealCell
+    @Override
+    public int compareTo(ACell other) {
+        if (other instanceof RealCell) {
+        }
+        return -1;
+    }
+
 }

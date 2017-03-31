@@ -137,12 +137,10 @@ public class FormulaCell extends RealCell {
 
     // Calculates the sum of a region
     private double sum(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
-        double total = 0;
-        Location[] locs = Spreadsheet.getLocsInRegion(ULCorner, DRCorner);
-        for (Location loc : locs) {
-            total += this.locToDouble(loc, callStack);
-        }
-        return total;
+        return Spreadsheet.getLocsInRegion(ULCorner, DRCorner)
+                          .stream()
+                          .mapToDouble(x -> this.locToDouble(x, callStack))
+                          .sum();
     }
 
     // calculates the avg of a region

@@ -20,12 +20,23 @@ public abstract class RealCell extends ACell {
 
     public abstract double getDoubleValue(Deque<RealCell> callStack);
 
-    //TODO Implement RealCell compared to RealCell
     @Override
     public int compareTo(ACell other) {
+        // Compared to a RealCell
         if (other instanceof RealCell) {
+            double thisValue = this.getDoubleValue();
+            double otherValue = ((RealCell) other).getDoubleValue();
+            if (thisValue < otherValue) {
+                return -1;
+            } else if (thisValue == otherValue) {
+                return 0;
+            } else if (thisValue > otherValue) {
+                return 1;
+            }
         }
-        return -1;
+
+        // A RealCell is greater than everything else
+        return 1;
     }
 
 }

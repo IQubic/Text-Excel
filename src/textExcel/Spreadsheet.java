@@ -122,6 +122,12 @@ public class Spreadsheet implements Grid {
         return output;
     }
 
+    private void sort(String range) {
+        String[] endPoints = range.split("-");
+        Location ULCorner = new SpreadsheetLocation(endPoints[0]);
+        Location DRCorner = new SpreadsheetLocation(endPoints[1]);
+    }
+
     @Override
     // Using a StringBuilder here saves memory
     public String getGridText() {
@@ -158,15 +164,13 @@ public class Spreadsheet implements Grid {
     }
 
     // Returns a list of all the locations in a given region
-    public static Location[] getLocsInRegion(Location ULCorner, Location DRCorner) {
-        Location[] locs = new Location[getRegionSize(ULCorner, DRCorner)];
+    public static List<Location> getLocsInRegion(Location ULCorner, Location DRCorner) {
+        List<Location> locs = new ArrayList<Location>(Spreadsheet.getRegionSize(ULCorner, DRCorner));
 
         // Iterate through the region
-        int locNum = 0;
         for (int row = ULCorner.getRow(); row <= DRCorner.getRow(); row++) {
             for (int col = ULCorner.getCol(); col <= DRCorner.getCol(); col++) {
-                locs[locNum] = new SpreadsheetLocation(row, col);
-                locNum++;
+                locs.add(new SpreadsheetLocation(row, col));
             }
         }
 

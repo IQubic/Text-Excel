@@ -25,6 +25,10 @@ public class TextCell extends ACell {
         if (other instanceof RealCell) {
             return -1;
         }
-        return this.text.compareTo(((TextCell) other).text);
+        return this.text.compareTo(((TextCell) other).getText);
+    }
+
+    public String getText() {
+        return this.text;
     }
 }

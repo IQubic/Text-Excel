@@ -128,7 +128,6 @@ public class Spreadsheet implements Grid {
         return output;
     }
 
-        // TODO reassign the cells
     private void sort(String range, int factor) {
         // Get all the cells in the region
         String[] endPoints = range.split("-");
@@ -144,10 +143,13 @@ public class Spreadsheet implements Grid {
         // Sort the cells
         Spreadsheet.quicksort(cells, 0, cells.size() - 1, factor);
 
-        // TODO reassign the cells
+        // Reassign the cells to their new locations
+        for (int i = 0; i < locs.size(); i++) {
+            this.set(locs.get(i), cells.get(i));
+        }
     }
 
-    // Sorts all elements of cell that lie within the range startIndex to endIndex inclusive
+    // Sorts all elements of the cells list that lie within the range startIndex to endIndex inclusive
     // Factor determines if we are sorting asceding or desceding
     private static void quicksort(List<Cell> cells, int startIndex, int endIndex, int factor) {
         // Partitioning the array

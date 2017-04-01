@@ -20,4 +20,9 @@ public abstract class ACell implements Cell {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.fullCellText();
+    }
+
 }

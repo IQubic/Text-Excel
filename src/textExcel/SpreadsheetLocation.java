@@ -35,4 +35,9 @@ public class SpreadsheetLocation implements Location {
     public int getCol() {
         return this.col;
     }
+
+    @Override
+    public String toString() {
+        return "Row: " + this.row + " Col: " + this.col;
+    }
 }

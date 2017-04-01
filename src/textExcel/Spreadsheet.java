@@ -16,12 +16,12 @@ public class Spreadsheet implements Grid {
     }
 
     @Override
-    //TODO Add sorta and sortd handling
     public String processCommand(String command) {
         // Variables for logging history
         String output;
         String originalCommand = command;
         boolean logCommand = true;
+
         command = command.trim();
         // Cell Inspection
         if (command.matches("[A-Za-z][0-9][0-9]?")){
@@ -33,19 +33,24 @@ public class Spreadsheet implements Grid {
             String[] setCommand = command.split("\\s+=\\s+", 2);
             this.set(setCommand);
             output = this.getGridText();
-         } else if (command.toLowerCase().contains("history")) {
+        } else if (command.toLowerCase().contains("history")) {
             // Don't log this command
             logCommand = false;
-
             // Grab the arguments to the history command
             output = this.processHistoryCommand(command.split("\\s+", 2)[1].split("\\s+"));
-       // Clear all
-        } else if (command.toLowerCase().equals("clear")) {
+        // Clear all
+        } else if (command.equalsIgnoreCase("clear")) {
             this.clear();
             output = this.getGridText();
         // Clear a single cell
         } else if (command.toLowerCase().contains("clear")) {
             this.clear(new SpreadsheetLocation(command.substring(6)));
+            output = this.getGridText();
+        } else if (command.toLowerCase().contains("sorta")) {
+            this.sort(command.split("\\s+")[1], 1);
+            output = this.getGridText();
+        } else if (command.toLowerCase().contains("sortd")) {
+            this.sort(command.split("\\s+")[1], -1);
             output = this.getGridText();
         } else {
             output = "";
@@ -123,6 +128,7 @@ public class Spreadsheet implements Grid {
         return output;
     }
 
+        // TODO reassign the cells
     private void sort(String range, int factor) {
         // Get all the cells in the region
         String[] endPoints = range.split("-");
@@ -136,24 +142,20 @@ public class Spreadsheet implements Grid {
         }
 
         // Sort the cells
-        Spreadsheet.Quicksort(cells, 0, cells.size() - 1, factor);
+        Spreadsheet.quicksort(cells, 0, cells.size() - 1, factor);
 
-        // Update each location with its new cell
-        int locNum = 0;
-        for (Cell cell : cells) {
-            this.set(locs.get(locNum), cell);
-        }
+        // TODO reassign the cells
     }
 
     // Sorts all elements of cell that lie within the range startIndex to endIndex inclusive
     // Factor determines if we are sorting asceding or desceding
-    private static void Quicksort(List<Cell> cells, int startIndex, int endIndex, int factor) {
+    private static void quicksort(List<Cell> cells, int startIndex, int endIndex, int factor) {
         // Partitioning the array
 
+        // Keep track of which elements we've examined
+        int compIndex = startIndex;
         // Use the last element as the pivot
         int pivotIndex = endIndex;
-        // Keep track of how many elements we've examined
-        int compIndex = 0;
 
         while (compIndex < pivotIndex) {
             // compCell comes before the pivot
@@ -167,18 +169,27 @@ public class Spreadsheet implements Grid {
             // Moves the pivot forward 1 element,
             // and brings a new element into the compIndex
             } else {
-                cells.add(cells.remove(compIndex));
+                moveToEndOfSublist(cells, compIndex, endIndex);
                 pivotIndex--;
             }
         }
 
         // Sort the left if needed
         if (pivotIndex - startIndex > 1) {
-            Quicksort(cells, startIndex, pivotIndex - 1, factor);
+            quicksort(cells, startIndex, pivotIndex - 1, factor);
         }
         // Sort the right if needed
         if (endIndex - pivotIndex > 1) {
-            Quicksort(cells, pivotIndex + 1, endIndex, factor);
+            quicksort(cells, pivotIndex + 1, endIndex, factor);
+        }
+    }
+
+    // Moves the item at elementIndex to the spot following endOfSublist
+    private static void moveToEndOfSublist(List<Cell> cells, int elementIndex, int endOfSublist) {
+        if (endOfSublist == cells.size() - 1) {
+            cells.add(cells.remove(elementIndex));
+        } else {
+            cells.add(endOfSublist, cells.remove(elementIndex));
         }
     }
 

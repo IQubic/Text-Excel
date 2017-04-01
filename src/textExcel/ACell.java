@@ -1,13 +1,13 @@
 package textExcel;
 
-public abstract class ACell implements Cell, Comparable<ACell> {
+public abstract class ACell implements Cell {
     @Override
     public abstract String fullCellText();
 
     @Override
     public abstract String abbreviatedCellText();
 
-    public abstract int compareTo(ACell other);
+    public abstract int compareTo(Cell other);
 
     public static String formatCellText(String s) {
         if (s.length() < 10) {

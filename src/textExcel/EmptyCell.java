@@ -12,7 +12,7 @@ public class EmptyCell extends ACell {
     }
 
     @Override
-    public int compareTo(ACell other) {
+    public int compareTo(Cell other) {
         // Compare to an EmptyCell
         if (other instanceof EmptyCell) {
             return 0;

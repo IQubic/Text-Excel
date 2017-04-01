@@ -16,6 +16,7 @@ public class Spreadsheet implements Grid {
     }
 
     @Override
+    //TODO Add sorta and sortd handling
     public String processCommand(String command) {
         // Variables for logging history
         String output;
@@ -122,14 +123,67 @@ public class Spreadsheet implements Grid {
         return output;
     }
 
-    private void sort(String range) {
+    private void sort(String range, int factor) {
+        // Get all the cells in the region
         String[] endPoints = range.split("-");
         Location ULCorner = new SpreadsheetLocation(endPoints[0]);
         Location DRCorner = new SpreadsheetLocation(endPoints[1]);
+
+        List<Location> locs = Spreadsheet.getLocsInRegion(ULCorner, DRCorner);
+        List<Cell> cells = new ArrayList<>(Spreadsheet.getRegionSize(ULCorner, DRCorner));
+        for (Location loc : locs) {
+            cells.add(this.getCell(loc));
+        }
+
+        // Sort the cells
+        Spreadsheet.Quicksort(cells, 0, cells.size() - 1, factor);
+
+        // Update each location with its new cell
+        int locNum = 0;
+        for (Cell cell : cells) {
+            this.set(locs.get(locNum), cell);
+        }
     }
 
-    @Override
+    // Sorts all elements of cell that lie within the range startIndex to endIndex inclusive
+    // Factor determines if we are sorting asceding or desceding
+    private static void Quicksort(List<Cell> cells, int startIndex, int endIndex, int factor) {
+        // Partitioning the array
+
+        // Use the last element as the pivot
+        int pivotIndex = endIndex;
+        // Keep track of how many elements we've examined
+        int compIndex = 0;
+
+        while (compIndex < pivotIndex) {
+            // compCell comes before the pivot
+            // so no movement is needed
+            // compIndex is updated so we get a new element to compare to
+            if (factor * cells.get(compIndex).compareTo(cells.get(pivotIndex)) < 0) {
+                compIndex++;
+
+            // compCell goes after the pivot
+            // Moving compCell to the end of the list
+            // Moves the pivot forward 1 element,
+            // and brings a new element into the compIndex
+            } else {
+                cells.add(cells.remove(compIndex));
+                pivotIndex--;
+            }
+        }
+
+        // Sort the left if needed
+        if (pivotIndex - startIndex > 1) {
+            Quicksort(cells, startIndex, pivotIndex - 1, factor);
+        }
+        // Sort the right if needed
+        if (endIndex - pivotIndex > 1) {
+            Quicksort(cells, pivotIndex + 1, endIndex, factor);
+        }
+    }
+
     // Using a StringBuilder here saves memory
+    @Override
     public String getGridText() {
         StringBuilder grid = new StringBuilder();
 

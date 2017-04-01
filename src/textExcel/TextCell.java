@@ -18,14 +18,14 @@ public class TextCell extends ACell {
     }
 
     @Override
-    public int compareTo(ACell other) {
+    public int compareTo(Cell other) {
         if (other instanceof EmptyCell) {
             return 1;
         }
         if (other instanceof RealCell) {
             return -1;
         }
-        return this.text.compareTo(((TextCell) other).getText);
+        return this.text.compareTo(((TextCell) other).getText());
     }
 
     public String getText() {

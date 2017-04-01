@@ -1,6 +1,7 @@
 package textExcel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FormulaCell extends RealCell {
     private String formula;
@@ -10,7 +11,7 @@ public class FormulaCell extends RealCell {
     // super.doubleValue is never used, as getDoubleValue is overridden here
     public FormulaCell(String formula, Spreadsheet sheetRef) {
         // This field is never used in a formula cell
-        this.formula = formula;
+        this.formula = formula.toUpperCase();
         // Use the uppercase form
         this.rpn = convertToRPN(this.formula);
         this.sheetRef = sheetRef;
@@ -19,7 +20,7 @@ public class FormulaCell extends RealCell {
     // Converts an equation string into rpn
     // RPN conversion is done with Edsger Dijkstra's Shunting Yard Algorithm
     private static List<String> convertToRPN(String formula) {
-        String[] tokens = formula.toLowerCase().split("\\s+");
+        String[] tokens = formula.split("\\s+");
         List<String> rpn = new ArrayList<>(tokens.length);
 
         // Higher value means higher precedence
@@ -28,8 +29,8 @@ public class FormulaCell extends RealCell {
         precedence.put("-", 1);
         precedence.put("*", 2);
         precedence.put("/", 2);
-        precedence.put("sum", 3);
-        precedence.put("avg", 3);
+        precedence.put("SUM", 3);
+        precedence.put("AVG", 3);
         // A stack to use for the rpn conversion
         Deque<String> opStack = new ArrayDeque<>();
 
@@ -139,8 +140,7 @@ public class FormulaCell extends RealCell {
     private double sum(Location ULCorner, Location DRCorner, Deque<RealCell> callStack) throws IllegalArgumentException {
         return Spreadsheet.getLocsInRegion(ULCorner, DRCorner)
                           .stream()
-                          .mapToDouble(x -> this.locToDouble(x, callStack))
-                          .sum();
+                          .collect(Collectors.summingDouble(x -> this.locToDouble(x, callStack)));
     }
 
     // calculates the avg of a region

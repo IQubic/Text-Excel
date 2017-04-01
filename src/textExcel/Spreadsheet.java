@@ -128,6 +128,9 @@ public class Spreadsheet implements Grid {
         return output;
     }
 
+    // Parses the range, gets the cells,
+    // calls the sort algorithm,
+    // and then reassigns the cells
     private void sort(String range, int factor) {
         // Get all the cells in the region
         String[] endPoints = range.split("-");
@@ -188,8 +191,11 @@ public class Spreadsheet implements Grid {
 
     // Moves the item at elementIndex to the spot following endOfSublist
     private static void moveToEndOfSublist(List<Cell> cells, int elementIndex, int endOfSublist) {
+        // Adding to the end of the list
         if (endOfSublist == cells.size() - 1) {
             cells.add(cells.remove(elementIndex));
+
+        // Adding to the middle of the array
         } else {
             cells.add(endOfSublist, cells.remove(elementIndex));
         }

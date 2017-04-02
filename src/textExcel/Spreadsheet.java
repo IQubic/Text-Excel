@@ -1,6 +1,7 @@
 package textExcel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Spreadsheet implements Grid {
     private int rows;
@@ -138,11 +139,10 @@ public class Spreadsheet implements Grid {
         Location DRCorner = new SpreadsheetLocation(endPoints[1]);
 
         List<Location> locs = Spreadsheet.getLocsInRegion(ULCorner, DRCorner);
-        List<Cell> cells = new ArrayList<>(Spreadsheet.getRegionSize(ULCorner, DRCorner));
-        for (Location loc : locs) {
-            cells.add(this.getCell(loc));
-        }
-
+        List<ACell> cells = Spreadsheet.getLocsInRegion(ULCorner, DRCorner)
+                                       .stream()
+                                       .map(x -> (ACell) this.getCell(x))
+                                       .collect(Collectors.toList());
         // Sort the cells
         Spreadsheet.quicksort(cells, 0, cells.size() - 1, factor);
 
@@ -154,7 +154,7 @@ public class Spreadsheet implements Grid {
 
     // Sorts all elements of the cells list that lie within the range startIndex to endIndex inclusive
     // Factor determines if we are sorting asceding or desceding
-    private static void quicksort(List<Cell> cells, int startIndex, int endIndex, int factor) {
+    private static void quicksort(List<ACell> cells, int startIndex, int endIndex, int factor) {
         // Partitioning the array
 
         // Keep track of which elements we've examined
@@ -190,7 +190,7 @@ public class Spreadsheet implements Grid {
     }
 
     // Moves the item at elementIndex to the spot following endOfSublist
-    private static void moveToEndOfSublist(List<Cell> cells, int elementIndex, int endOfSublist) {
+    private static void moveToEndOfSublist(List<ACell> cells, int elementIndex, int endOfSublist) {
         // Adding to the end of the list
         if (endOfSublist == cells.size() - 1) {
             cells.add(cells.remove(elementIndex));

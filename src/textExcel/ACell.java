@@ -1,6 +1,6 @@
 package textExcel;
 
-public abstract class ACell implements Cell {
+public abstract class ACell implements Cell, Comparable<Cell> {
     @Override
     public abstract String fullCellText();
 

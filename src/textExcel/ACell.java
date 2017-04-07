@@ -9,7 +9,7 @@ public abstract class ACell implements Cell, Comparable<Cell> {
 
     public abstract int compareTo(Cell other);
 
-    public static String formatCellText(String s) {
+    protected static String formatCellText(String s) {
         if (s.length() < 10) {
             for (int i = s.length(); i < 10; i++) {
                 s += " ";

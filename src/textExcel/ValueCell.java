@@ -20,7 +20,7 @@ public class ValueCell extends RealCell {
     }
 
     @Override
-    public double getDoubleValue(Deque<RealCell> callStack) {
+    protected double getDoubleValue(Deque<RealCell> callStack) {
         return this.doubleValue;
     }
 }

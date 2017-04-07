@@ -18,7 +18,7 @@ public abstract class RealCell extends ACell {
 
     public abstract double getDoubleValue();
 
-    public abstract double getDoubleValue(Deque<RealCell> callStack);
+    protected abstract double getDoubleValue(Deque<RealCell> callStack);
 
     @Override
     public int compareTo(Cell other) {

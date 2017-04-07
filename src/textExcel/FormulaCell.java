@@ -64,7 +64,7 @@ public class FormulaCell extends RealCell {
 
     // Evaluates the formula stored in this cell
     @Override
-    public double getDoubleValue(Deque<RealCell> callStack) throws IllegalArgumentException {
+    protected double getDoubleValue(Deque<RealCell> callStack) throws IllegalArgumentException {
         if (callStack.contains(this)) {
             throw new IllegalArgumentException();
         }

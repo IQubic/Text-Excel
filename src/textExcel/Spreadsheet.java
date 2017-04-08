@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class Spreadsheet implements Grid {
     private static final int ROWS = 20;
-    private static final int COLS = 12;
+    private static final int COLS = 8;
     private Cell[][] spreadsheet;
 
     public Spreadsheet() {
@@ -80,7 +80,8 @@ public class Spreadsheet implements Grid {
         // FormulaCell
         } else if (value.contains("(")) {
             // Extract just the formula rom the value string
-            String formula = value.split("\\(\\s+|\\s+\\)")[1];
+            String formula = value.substring(value.indexOf("(") + 1, value.lastIndexOf(")")).trim();
+            System.out.println(formula);
             this.set(loc, new FormulaCell(formula, this));
         // ValueCell
         } else {

@@ -25,6 +25,8 @@ public class FormulaCell extends RealCell {
 
         // Higher value means higher precedence
         Map<String, Integer> precedence = new HashMap<>();
+        precedence.put("(", 0);
+        precedence.put(")", 0);
         precedence.put("+", 1);
         precedence.put("-", 1);
         precedence.put("*", 2);
@@ -42,10 +44,17 @@ public class FormulaCell extends RealCell {
 
             // Token is a operator
             } else {
-                while (!opStack.isEmpty() && precedence.get(token) <= precedence.get(opStack.peek())) {
-                    rpn.add(opStack.pop());
+                if (token.equals(")")) {
+                    while (!opStack.peek().equals("(")) {
+                        rpn.add(opStack.pop());
+                    }
+                    opStack.pop();
+                } else {
+                    while (!opStack.isEmpty() && precedence.get(token) <= precedence.get(opStack.peek())) {
+                        rpn.add(opStack.pop());
+                    }
+                    opStack.push(token);
                 }
-                opStack.push(token);
             } // END OF OPERATOR PARSING
         }
         // clear out the remaining operators

@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class Spreadsheet implements Grid {
     private static final int ROWS = 20;
-    private static final int COLS = 8;
+    private static final int COLS = 12;
     private Cell[][] spreadsheet;
 
     public Spreadsheet() {

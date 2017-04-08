@@ -4,16 +4,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Spreadsheet implements Grid {
-    private int rows;
-    private int cols;
+    private static final int ROWS = 20;
+    private static final int COLS = 12;
     private Cell[][] spreadsheet;
 
     public Spreadsheet() {
-        this.rows = 20;
-        this.cols = 12;
-        this.spreadsheet = new Cell[rows][cols];
-        History.getHistory().init();
+        this.spreadsheet = new Cell[ROWS][COLS];
         this.clear();
+        History.getHistory().init();
     }
 
     @Override
@@ -208,17 +206,17 @@ public class Spreadsheet implements Grid {
 
         // Header
         grid.append("   |");
-        for (int i = 0; i < this.cols; i++) {
+        for (int i = 0; i < this.COLS; i++) {
             String colLetter = Character.toString((char) ('A' + i));
             grid.append(pad(colLetter, 10) + "|");
         }
 
         // Print the rows
-        for (int rows = 0; rows < this.rows; rows++) {
+        for (int rows = 0; rows < this.ROWS; rows++) {
             // Get the row number properly spaced
             grid.append("\n" + pad(Integer.toString(rows + 1), 3) + "|");
             // Append the row content
-            for (int cols = 0; cols < this.cols; cols++) {
+            for (int cols = 0; cols < this.COLS; cols++) {
                 Cell curCell = this.getCell(new SpreadsheetLocation(rows, cols));
                 grid.append(curCell.abbreviatedCellText() + "|");
             }
@@ -261,11 +259,11 @@ public class Spreadsheet implements Grid {
 
     @Override
     public int getRows() {
-        return this.rows;
+        return ROWS;
     }
 
     @Override
     public int getCols() {
-        return this.cols;
+        return COLS;
     }
 }
